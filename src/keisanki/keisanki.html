@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>misamoji Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
+            color: black;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            width: 320px;
+            max-width: 90vw;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .display {
+            background: rgba(248, 249, 250, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: right;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 
+                inset 0 2px 4px rgba(0, 0, 0, 0.1),
+                0 1px 0 rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .history {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 5px;
+            min-height: 20px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            opacity: 0.8;
+            max-height: 60px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .formula {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 8px;
+            min-height: 25px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .result {
+            font-size: 36px;
+            font-weight: 700;
+            color: black;
+            min-height: 45px;
+            letter-spacing: 1px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 18px;
+            font-size: 22px;
+            font-weight: 600;
+            height: 65px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: black;
+            letter-spacing: 0.5px;
+            box-shadow: 
+                0 4px 8px rgba(0, 0, 0, 0.1),
+                0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn:hover {
+            transform: scale(0.95);
+            box-shadow: 
+                0 6px 12px rgba(0, 0, 0, 0.15),
+                0 2px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .btn:active {
+            transform: scale(0.9);
+            box-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.2),
+                inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-number {
+            background: rgba(233, 236, 239, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .btn-number:hover {
+            background: rgba(222, 226, 230, 0.95);
+        }
+
+        .btn-operator {
+            background: rgba(255, 179, 209, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .btn-operator:hover {
+            background: rgba(255, 158, 199, 0.95);
+        }
+
+        .btn-equals {
+            background: rgba(255, 20, 147, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            grid-row: span 2;
+            height: 145px;
+        }
+
+        .btn-equals:hover {
+            background: rgba(233, 30, 99, 0.95);
+        }
+
+        .btn-clear {
+            background: rgba(255, 179, 209, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .btn-clear:hover {
+            background: rgba(255, 158, 199, 0.95);
+        }
+
+        .brand {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 20px;
+            color: rgba(255, 179, 209, 0.9);
+            font-weight: 700;
+            font-style: italic;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .brand::before {
+            content: "✨ ";
+        }
+
+        .brand::after {
+            content: " ✨";
+        }
+
+        @media (max-width: 480px) {
+            .calculator {
+                width: 100%;
+                padding: 20px;
+            }
+            
+            .btn {
+                height: 55px;
+                font-size: 20px;
+            }
+            
+            .btn-equals {
+                height: 125px;
+            }
+            
+            .display {
+                padding: 20px;
+                min-height: 80px;
+            }
+            
+            .result {
+                font-size: 32px;
+            }
+            
+            .formula {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <div class="history" id="history"></div>
+            <div class="formula" id="formula"></div>
+            <div class="result" id="result">0</div>
+        </div>
+        
+        <div class="buttons">
+            <button class="btn btn-clear" onclick="clearAll()">C</button>
+            <button class="btn btn-operator" onclick="inputOperator('/')">÷</button>
+            <button class="btn btn-operator" onclick="inputOperator('*')">×</button>
+            <button class="btn btn-operator" onclick="deleteLast()">⌫</button>
+            
+            <button class="btn btn-number" onclick="inputNumber('7')">7</button>
+            <button class="btn btn-number" onclick="inputNumber('8')">8</button>
+            <button class="btn btn-number" onclick="inputNumber('9')">9</button>
+            <button class="btn btn-operator" onclick="inputOperator('-')">-</button>
+            
+            <button class="btn btn-number" onclick="inputNumber('4')">4</button>
+            <button class="btn btn-number" onclick="inputNumber('5')">5</button>
+            <button class="btn btn-number" onclick="inputNumber('6')">6</button>
+            <button class="btn btn-operator" onclick="inputOperator('+')">+</button>
+            
+            <button class="btn btn-number" onclick="inputNumber('1')">1</button>
+            <button class="btn btn-number" onclick="inputNumber('2')">2</button>
+            <button class="btn btn-number" onclick="inputNumber('3')">3</button>
+            <button class="btn btn-equals" onclick="calculate()">=</button>
+            
+            <button class="btn btn-number" onclick="inputNumber('0')" style="grid-column: span 2;">0</button>
+            <button class="btn btn-number" onclick="inputDecimal()">.</button>
+        </div>
+        
+        <div class="brand">misamoji</div>
+    </div>
+
+    <script>
+        let currentInput = '';
+        let operator = '';
+        let previousInput = '';
+        let shouldResetDisplay = false;
+        let calculationHistory = [];
+        let clearCount = 0;
+        let lastClearTime = 0;
+
+        const formulaElement = document.getElementById('formula');
+        const resultElement = document.getElementById('result');
+        const historyElement = document.getElementById('history');
+
+        function updateDisplay() {
+            resultElement.textContent = currentInput || '0';
+        }
+
+        function updateHistory() {
+            if (calculationHistory.length > 0) {
+                historyElement.innerHTML = calculationHistory
+                    .slice(-3) // 最新の3件のみ表示
+                    .map(item => `<div>${item}</div>`)
+                    .join('');
+            } else {
+                historyElement.innerHTML = '';
+            }
+        }
+
+        function updateFormula() {
+            if (previousInput && operator && currentInput) {
+                formulaElement.textContent = `${previousInput} ${operator} ${currentInput}`;
+            } else if (previousInput && operator) {
+                formulaElement.textContent = `${previousInput} ${operator}`;
+            } else {
+                formulaElement.textContent = '';
+            }
+        }
+
+        function inputNumber(num) {
+            if (shouldResetDisplay) {
+                currentInput = '';
+                shouldResetDisplay = false;
+            }
+            
+            if (currentInput === '0' && num !== '.') {
+                currentInput = num;
+            } else {
+                currentInput += num;
+            }
+            
+            updateDisplay();
+            updateFormula();
+        }
+
+        function inputDecimal() {
+            if (shouldResetDisplay) {
+                currentInput = '';
+                shouldResetDisplay = false;
+            }
+            
+            if (!currentInput.includes('.')) {
+                currentInput += currentInput === '' ? '0.' : '.';
+                updateDisplay();
+                updateFormula();
+            }
+        }
+
+        function inputOperator(op) {
+            if (previousInput && operator && currentInput) {
+                calculate();
+            }
+            
+            operator = op;
+            previousInput = currentInput || '0';
+            currentInput = '';
+            shouldResetDisplay = false;
+            
+            updateFormula();
+        }
+
+        function calculate() {
+            if (!previousInput || !operator || currentInput === '') {
+                return;
+            }
+
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+            let result;
+
+            switch (operator) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    if (current === 0) {
+                        result = 'Error';
+                    } else {
+                        result = prev / current;
+                    }
+                    break;
+                default:
+                    return;
+            }
+
+            // 計算式を正しく表示するために、currentInputを更新する前に保存
+            const originalCurrentInput = currentInput;
+            
+            if (result === 'Error') {
+                currentInput = 'Error';
+            } else {
+                currentInput = result.toString();
+            }
+            
+            // 正しい計算式を表示（元の入力値を使用）
+            formulaElement.textContent = `${previousInput} ${operator} ${originalCurrentInput} =`;
+            
+            // 計算結果を履歴に追加
+            const historyEntry = `${previousInput} ${operator} ${originalCurrentInput} = ${currentInput}`;
+            calculationHistory.push(historyEntry);
+            
+            updateDisplay();
+            updateHistory();
+            
+            operator = '';
+            previousInput = '';
+            shouldResetDisplay = true;
+        }
+
+        function clearAll() {
+            const currentTime = Date.now();
+            
+            // 1秒以内にCを押した場合は連続押しとして扱う
+            if (currentTime - lastClearTime < 1000) {
+                clearCount++;
+            } else {
+                clearCount = 1;
+            }
+            
+            lastClearTime = currentTime;
+            
+            // 1回目：現在の入力のみクリア
+            if (clearCount === 1) {
+                currentInput = '';
+                operator = '';
+                previousInput = '';
+                shouldResetDisplay = false;
+                
+                formulaElement.textContent = '';
+                updateDisplay();
+            }
+            // 2回目：履歴も含めて全てクリア
+            else if (clearCount >= 2) {
+                currentInput = '';
+                operator = '';
+                previousInput = '';
+                shouldResetDisplay = false;
+                calculationHistory = [];
+                clearCount = 0;
+                
+                formulaElement.textContent = '';
+                updateDisplay();
+                updateHistory();
+            }
+        }
+
+        function deleteLast() {
+            if (currentInput.length > 0) {
+                currentInput = currentInput.slice(0, -1);
+                updateDisplay();
+                updateFormula();
+            }
+        }
+
+        // キーボードサポート
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            
+            if (key >= '0' && key <= '9') {
+                inputNumber(key);
+            } else if (key === '.') {
+                inputDecimal();
+            } else if (['+', '-', '*', '/'].includes(key)) {
+                inputOperator(key);
+            } else if (key === 'Enter' || key === '=') {
+                calculate();
+            } else if (key === 'Escape' || key === 'c' || key === 'C') {
+                clearAll();
+            } else if (key === 'Backspace') {
+                deleteLast();
+            }
+        });
+    </script>
+</body>
+</html>
